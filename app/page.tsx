@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import {useState} from "react";
 
 const userLoginSchema = z.object({
   email: z.string().min(1, "Email is required").email(),
@@ -28,6 +29,8 @@ export default function Login() {
     },
   });
 
+  const [success, setSuccess] = useState(false);
+
   async function onSubmit(data: z.infer<typeof userLoginSchema>) {
     const res = await fetch("http://localhost:3000/api/login", {
       method: "POST",
@@ -37,8 +40,10 @@ export default function Login() {
     const resData = (await res.json()) as { success: boolean; msg: string };
 
     if (resData.success) {
+      setSuccess(true)
       form.reset();
     } else {
+      setSuccess(false)
       toast.error(resData.msg);
     }
   }
@@ -51,6 +56,12 @@ export default function Login() {
           className="mx-auto w-full max-w-lg flex flex-col space-y-5 bg-card p-10 border rounded-md"
         >
           <h1>Login</h1>
+          {
+            success && (
+                <h3>Login successful</h3>
+              )
+          }
+
           <FormField
             control={form.control}
             name="email"
